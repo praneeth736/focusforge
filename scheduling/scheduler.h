@@ -8,9 +8,11 @@ struct Task {
     string name;
     int burst;
     int priority;
+    int arrival;
 };
 
 void FCFS(vector<Task> tasks);
 void SJF(vector<Task> tasks);
 void PriorityScheduling(vector<Task> tasks);
+void RoundRobin(vector<Task> tasks, int quantum);
 #endif
