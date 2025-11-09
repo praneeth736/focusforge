@@ -1,63 +1,55 @@
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
+#include <bits/stdc++.h>
 #include "scheduler.h"
 using namespace std;
 
 void RoundRobin(vector<Task> tasks, int quantum) {
+    int n = tasks.size();
+    vector<int> rem(n), waiting(n, 0), turnaround(n, 0);
 
-    sort(tasks.begin(), tasks.end(), [](Task &a, Task &b){
-        return a.arrival < b.arrival;
-    });
-
-    queue<int> q;
-    vector<int> remainingBurst(tasks.size());
-    vector<int> completionTime(tasks.size(), 0);
-
-    for(int i = 0; i < tasks.size(); i++)
-        remainingBurst[i] = tasks[i].burst;
+    for(int i = 0; i < n; i++)
+        rem[i] = tasks[i].burst;
 
     int time = 0;
-    int index = 0;
+    bool done;
 
-    while(index < tasks.size() && tasks[index].arrival <= time){
-        q.push(index);
-        index++;
-    }
+    while (true) {
+        done = true;
 
-    if(q.empty()) {
-        time = tasks[0].arrival;
-        q.push(0);
-        index = 1;
-    }
+        for(int i = 0; i < n; i++) {
+            if(rem[i] > 0) {
+                done = false;
 
-    while(!q.empty()) {
-        int i = q.front();
-        q.pop();
+                int run = min(quantum, rem[i]);
+                rem[i] -= run;
+                time += run;
 
-        int exec = min(quantum, remainingBurst[i]);
-        remainingBurst[i] -= exec;
-        time += exec;
-
-        while(index < tasks.size() && tasks[index].arrival <= time){
-            q.push(index);
-            index++;
+                if(rem[i] == 0)
+                    turnaround[i] = time;
+            }
         }
-
-        if(remainingBurst[i] > 0){
-            q.push(i);
-        } else {
-            completionTime[i] = time;
-        }
+        if(done) break;
     }
 
-    cout << "\n---- Round Robin Scheduling ----\n";
-    cout << "Task\tArrival\tBurst\tCompletion\n";
-    for(int i = 0; i < tasks.size(); i++){
-        cout << tasks[i].name << "\t"
-             << tasks[i].arrival << "\t"
-             << tasks[i].burst << "\t"
-             << completionTime[i] << endl;
+    for(int i = 0; i < n; i++)
+        waiting[i] = turnaround[i] - tasks[i].burst;
+
+    cout << "\n---------------- Round Robin Scheduling ----------------\n";
+    cout << "Time Quantum = " << quantum << "\n\n";
+
+    cout << left << setw(20) << "Task Name"
+         << setw(8)  << "Burst"
+         << setw(10) << "Waiting"
+         << setw(12) << "Turnaround" << "\n";
+
+    cout << string(52, '-') << "\n";
+
+    for(int i = 0; i < n; i++){
+        cout << left << setw(20) << tasks[i].name
+             << setw(8)  << tasks[i].burst
+             << setw(10) << waiting[i]
+             << setw(12) << turnaround[i] << "\n";
     }
+
+    cout << string(52, '-') << "\n";
+    cout << "Total CPU Time: " << time << "\n";
 }

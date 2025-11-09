@@ -1,17 +1,41 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include "../scheduling/scheduler.h"
+#include <bits/stdc++.h>
+#include "scheduler.h"
 using namespace std;
 
 void FCFS(vector<Task> tasks) {
-    cout << "\n--- FCFS Scheduling ---\n";
+    int n = tasks.size();
+    int total_wait = 0, total_turn = 0;
 
-    int time = 0;
-    for (auto &t : tasks) {
-        cout << t.name << " executed for " << t.burst << " units.\n";
-        time += t.burst;
+    // Waiting time and turnaround calculation
+    vector<int> waiting(n), turnaround(n);
+    waiting[0] = 0;
+
+    for (int i = 1; i < n; i++) {
+        waiting[i] = waiting[i - 1] + tasks[i - 1].burst;
     }
 
-    cout << "Total Time: " << time << "\n";
+    for (int i = 0; i < n; i++) {
+        turnaround[i] = waiting[i] + tasks[i].burst;
+        total_wait += waiting[i];
+        total_turn += turnaround[i];
+    }
+
+    cout << "\n---------------- FCFS Scheduling ----------------\n\n";
+
+    cout << left << setw(20) << "Task Name"
+         << setw(10) << "Burst"
+         << setw(12) << "Waiting"
+         << setw(12) << "Turnaround" << "\n";
+
+    cout << string(54, '-') << "\n";
+
+    for (int i = 0; i < n; i++) {
+        cout << left << setw(20) << tasks[i].name
+             << setw(10) << tasks[i].burst
+             << setw(12) << waiting[i]
+             << setw(12) << turnaround[i] << "\n";
+    }
+
+    cout << string(54, '-') << "\n";
+    cout << "Total CPU Time: " << turnaround[n - 1] << "\n";
 }

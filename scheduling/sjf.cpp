@@ -1,22 +1,45 @@
 #include <bits/stdc++.h>
-#include "../scheduling/scheduler.h"
+#include "scheduler.h"
 using namespace std;
 
-// Shortest Job First Scheduling
 void SJF(vector<Task> tasks) {
-    // Sort by burst time
-    sort(tasks.begin(), tasks.end(), [](Task a, Task b){
+    int n = tasks.size();
+    
+    // Sort tasks by burst time (Shortest Job First)
+    sort(tasks.begin(), tasks.end(), [](Task &a, Task &b){
         return a.burst < b.burst;
     });
 
-    cout << "\n--- SJF Schedule ---\n";
-    int time = 0, waitingTime = 0;
+    vector<int> waiting(n), turnaround(n);
+    int total_wait = 0, total_turn = 0;
 
-    for (auto &t : tasks) {
-        cout << "Run: " << t.name << " (" << t.burst << " mins)\n";
-        waitingTime += time;
-        time += t.burst;
+    waiting[0] = 0;
+    for(int i = 1; i < n; i++){
+        waiting[i] = waiting[i - 1] + tasks[i - 1].burst;
     }
 
-    cout << "\nAverage Waiting Time: " << (float)waitingTime / tasks.size() << " mins\n";
+    for(int i = 0; i < n; i++){
+        turnaround[i] = waiting[i] + tasks[i].burst;
+        total_wait += waiting[i];
+        total_turn += turnaround[i];
+    }
+
+    cout << "\n---------------- SJF Scheduling ----------------\n\n";
+
+    cout << left << setw(20) << "Task Name"
+         << setw(10) << "Burst"
+         << setw(12) << "Waiting"
+         << setw(12) << "Turnaround" << "\n";
+
+    cout << string(54, '-') << "\n";
+
+    for (int i = 0; i < n; i++) {
+        cout << left << setw(20) << tasks[i].name
+             << setw(10) << tasks[i].burst
+             << setw(12) << waiting[i]
+             << setw(12) << turnaround[i] << "\n";
+    }
+
+    cout << string(54, '-') << "\n";
+    cout << "Total CPU Time: " << turnaround[n - 1] << "\n";
 }
