@@ -5,6 +5,9 @@
 #include "src/core/policy_engine.h"
 #include "src/algorithms/fcfs.h"
 #include "src/algorithms/sjf.h"
+#include "src/algorithms/priority.h"
+#include "src/algorithms/round_robin.h"
+
 
 using namespace std;
 
@@ -16,7 +19,10 @@ int main() {
     cout << "\nChoose Scheduler:\n";
     cout << "1. FCFS\n";
     cout << "2. SJF\n";
-    cout << "3. AUTO\n";
+    cout << "3. Priority\n";
+    cout << "4. Round Robin\n";
+    cout << "5. AUTO\n";
+
 
     int choice;
     cin >> choice;
@@ -45,22 +51,18 @@ int main() {
 
     Scheduler* scheduler = nullptr;
 
-    if (choice == 1) {
-        scheduler = new FCFS();
-    } 
-    else if (choice == 2) {
-        scheduler = new SJF();
-    } 
-    else if (choice == 3) {
-        auto policy = PolicyEngine::choosePolicy(allTasks);
-
-        if (policy == PolicyType::SJF) {
-            cout << "\n[AUTO] Selected SJF policy\n";
-            scheduler = new SJF();
-        } else {
-            cout << "\n[AUTO] Selected FCFS policy\n";
-            scheduler = new FCFS();
-        }
+    if (choice == 1) scheduler = new FCFS();
+    else if (choice == 2) scheduler = new SJF();
+    else if (choice == 3) scheduler = new PriorityScheduler();
+    else if (choice == 4) {
+    int q;
+    cout << "Enter time quantum: ";
+    cin >> q;
+    scheduler = new RoundRobin(q);
+    }
+    else if (choice == 5) {
+    auto policy = PolicyEngine::choosePolicy(allTasks);
+    scheduler = (policy == PolicyType::SJF) ? (Scheduler*)new SJF() : (Scheduler*)new FCFS();
     }
     else {
         cout << "Invalid choice\n";
