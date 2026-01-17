@@ -9,6 +9,7 @@ struct Task {
     int priority;
     int arrival;
     int queue_level;
+    int remaining;
 };
 
 #endif

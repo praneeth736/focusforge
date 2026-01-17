@@ -7,6 +7,8 @@
 #include "src/algorithms/sjf.h"
 #include "src/algorithms/priority.h"
 #include "src/algorithms/round_robin.h"
+#include "src/algorithms/srtf.h"
+
 
 
 using namespace std;
@@ -22,7 +24,7 @@ int main() {
     cout << "3. Priority\n";
     cout << "4. Round Robin\n";
     cout << "5. AUTO\n";
-
+    cout << "6. SRTF (Preemptive SJF)\n";
 
     int choice;
     cin >> choice;
@@ -36,6 +38,7 @@ int main() {
 
         cout << "Burst Time: ";
         cin >> t.burst;
+        t.remaining = t.burst;
 
         cout << "Priority: ";
         cin >> t.priority;
@@ -64,6 +67,7 @@ int main() {
     auto policy = PolicyEngine::choosePolicy(allTasks);
     scheduler = (policy == PolicyType::SJF) ? (Scheduler*)new SJF() : (Scheduler*)new FCFS();
     }
+    else if (choice == 6) scheduler = new SRTF();
     else {
         cout << "Invalid choice\n";
         return 0;
