@@ -1,12 +1,11 @@
-#ifndef PRIORITY_SCHEDULER_H
-#define PRIORITY_SCHEDULER_H
+#ifndef PRIORITY_H
+#define PRIORITY_H
 
 #include "../core/scheduler.h"
 
 class PriorityScheduler : public Scheduler {
 public:
     void run() override;
-    void printStats() override;
 };
 
 #endif

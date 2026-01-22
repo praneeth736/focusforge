@@ -128,3 +128,4 @@ This causes frequent context switching — just like real CPUs.
 
 ### Architectural clarity gained today
 
+  

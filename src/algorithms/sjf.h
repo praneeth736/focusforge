@@ -6,7 +6,6 @@
 class SJF : public Scheduler {
 public:
     void run() override;
-    void printStats() override;
 };
 
 #endif

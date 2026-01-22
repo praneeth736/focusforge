@@ -14,29 +14,51 @@ protected:
     std::vector<std::pair<int, std::string>> executionOrder;
     std::map<std::string, int> finishTime;
 
-    void computeStats() {
-        double totalWaiting = 0;
-        double totalTurnaround = 0;
+    int contextSwitches = 0;
+    int idleTime = 0;
+    std::string lastTask = "IDLE";
 
-        for (auto& t : tasks) {
-            int turnaround = finishTime[t.name] - t.arrival;
-            int waiting = turnaround - t.burst;
+    // called by algorithms
+    void recordExecution(int time, const std::string& taskName) {
 
-            totalWaiting += waiting;
-            totalTurnaround += turnaround;
+        if (taskName != lastTask) {
+            contextSwitches++;
+            executionOrder.push_back({time, taskName});
+            lastTask = taskName;
         }
 
-        std::cout << "\nExecution Order:\n";
-        for (auto& e : executionOrder) {
-            std::cout << "Time " << e.first << " -> " << e.second << "\n";
+        if (taskName == "IDLE") {
+            idleTime++;
         }
-
-        std::cout << "\nAverage Waiting Time: "
-                  << totalWaiting / tasks.size() << "\n";
-
-        std::cout << "Average Turnaround Time: "
-                  << totalTurnaround / tasks.size() << "\n";
     }
+
+   void computeStats() {
+    double totalWaiting = 0;
+    double totalTurnaround = 0;
+
+    for (auto& t : tasks) {
+        int turnaround = finishTime[t.name] - t.arrival;
+        int waiting = turnaround - t.burst;
+
+        totalWaiting += waiting;
+        totalTurnaround += turnaround;
+    }
+
+    std::cout << "\nExecution Timeline:\n";
+    for (auto& e : executionOrder) {
+        std::cout << "Time " << e.first << " -> " << e.second << "\n";
+    }
+
+    std::cout << "\nContext Switches: " << contextSwitches - 1 << "\n";
+    std::cout << "CPU Idle Time: " << idleTime << "\n";
+
+    std::cout << "\nAverage Waiting Time: "
+              << totalWaiting / tasks.size() << "\n";
+
+    std::cout << "Average Turnaround Time: "
+              << totalTurnaround / tasks.size() << "\n";
+}
+
 
 public:
     virtual ~Scheduler() {}

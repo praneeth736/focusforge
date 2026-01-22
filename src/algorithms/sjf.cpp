@@ -1,45 +1,49 @@
 #include "sjf.h"
 #include <algorithm>
 #include <iostream>
+#include<climits>
 
 using namespace std;
 
 void SJF::run() {
-    // Sort by burst time (shortest job first)
-    sort(tasks.begin(), tasks.end(), [](const Task& a, const Task& b) {
-        return a.burst < b.burst;
-    });
 
     int currentTime = 0;
-    cout << "\nExecution Order (SJF):\n";
+    int completed = 0;
+    int n = tasks.size();
 
-    for (auto& t : tasks) {
-        if (currentTime < t.arrival)
-            currentTime = t.arrival;
+    vector<bool> done(n, false);
 
-        cout << "Time " << currentTime << " -> " << t.name << endl;
-        currentTime += t.burst;
+    while (completed < n) {
+
+        int idx = -1;
+        int minBurst = INT_MAX;
+
+        // select shortest arrived job
+        for (int i = 0; i < n; i++) {
+            if (!done[i] &&
+                tasks[i].arrival <= currentTime &&
+                tasks[i].burst < minBurst) {
+
+                minBurst = tasks[i].burst;
+                idx = i;
+            }
+        }
+
+        // no job ready → CPU idle
+        if (idx == -1) {
+            recordExecution(currentTime, "IDLE");
+            currentTime++;
+            continue;
+        }
+
+        // run job
+        recordExecution(currentTime, tasks[idx].name);
+
+        currentTime += tasks[idx].burst;
+
+        finishTime[tasks[idx].name] = currentTime;
+
+        done[idx] = true;
+        completed++;
     }
-}
-
-void SJF::printStats() {
-    int currentTime = 0;
-    double totalWait = 0;
-    double totalTurnaround = 0;
-
-    for (auto& t : tasks) {
-        if (currentTime < t.arrival)
-            currentTime = t.arrival;
-
-        int wait = currentTime - t.arrival;
-        int turnaround = wait + t.burst;
-
-        totalWait += wait;
-        totalTurnaround += turnaround;
-
-        currentTime += t.burst;
-    }
-
-    cout << "\nAverage Waiting Time: " << totalWait / tasks.size();
-    cout << "\nAverage Turnaround Time: " << totalTurnaround / tasks.size() << endl;
 }

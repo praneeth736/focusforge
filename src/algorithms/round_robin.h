@@ -8,7 +8,6 @@ class RoundRobin : public Scheduler {
 public:
     RoundRobin(int q) : quantum(q) {}
     void run() override;
-    void printStats() override;
 };
 
 #endif
