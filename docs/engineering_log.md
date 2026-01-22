@@ -129,3 +129,82 @@ This causes frequent context switching — just like real CPUs.
 ### Architectural clarity gained today
 
   
+Day 4 – Intelligent AUTO Mode & Kernel Telemetry
+What was implemented
+
+AUTO mode upgraded from static selection to workload-aware scheduling
+
+AUTO now supports:
+
+FCFS
+
+SJF
+
+SRTF (preemptive)
+
+Priority Scheduling
+
+Round Robin
+
+Scheduler selection is now explicitly printed for transparency and debugging.
+
+Dynamic threshold redesign
+
+Previous implementation used fixed values such as:
+
+avgBurst < 20
+
+
+This was replaced with dynamic workload analysis, using:
+
+burst ratio (maxBurst / avgBurst)
+
+arrival time spread
+
+priority variance
+
+task count
+
+This avoids hard-coded constants and allows the scheduler to adapt to:
+
+small workloads
+
+large workloads
+
+heterogeneous CPU environments
+
+AUTO Mode Heuristics
+
+AUTO mode now classifies workloads using relative metrics:
+
+SJF
+Selected when jobs are similar in size and arrive together.
+
+SRTF
+Selected when short jobs arrive continuously and preemption is beneficial.
+
+Priority Scheduling
+Selected when priority variance is high.
+
+Round Robin
+Selected when many runnable processes exist (interactive systems).
+
+FCFS
+Used as safe fallback for batch workloads.
+
+Additional kernel improvements
+
+Centralized execution tracking inside Scheduler
+
+Context switch counting added
+
+CPU idle time tracking implemented
+
+Algorithms no longer compute statistics individually
+
+Kernel now owns all metrics and reporting
+
+VERY VERY IMPORTANTTTTTTTTTTTTTTTTT
+Replaced algorithm-level printing with kernel-level execution tracing
+
+Unified statistics computation across all scheduling policies

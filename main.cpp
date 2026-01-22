@@ -3,17 +3,17 @@
 
 #include "src/core/task.h"
 #include "src/core/policy_engine.h"
+
 #include "src/algorithms/fcfs.h"
 #include "src/algorithms/sjf.h"
 #include "src/algorithms/priority.h"
 #include "src/algorithms/round_robin.h"
 #include "src/algorithms/srtf.h"
 
-
-
 using namespace std;
 
 int main() {
+
     int n;
     cout << "Enter number of tasks: ";
     cin >> n;
@@ -23,8 +23,8 @@ int main() {
     cout << "2. SJF\n";
     cout << "3. Priority\n";
     cout << "4. Round Robin\n";
-    cout << "5. AUTO\n";
-    cout << "6. SRTF (Preemptive SJF)\n";
+    cout << "5. SRTF (Preemptive SJF)\n";
+    cout << "6. AUTO (Kernel Decides)\n";
 
     int choice;
     cin >> choice;
@@ -33,6 +33,7 @@ int main() {
 
     for (int i = 0; i < n; i++) {
         Task t;
+
         cout << "\nTask " << i + 1 << " Name: ";
         cin >> t.name;
 
@@ -54,20 +55,57 @@ int main() {
 
     Scheduler* scheduler = nullptr;
 
-    if (choice == 1) scheduler = new FCFS();
-    else if (choice == 2) scheduler = new SJF();
-    else if (choice == 3) scheduler = new PriorityScheduler();
+    if (choice == 1) {
+        scheduler = new FCFS();
+    }
+    else if (choice == 2) {
+        scheduler = new SJF();
+    }
+    else if (choice == 3) {
+        scheduler = new PriorityScheduler();
+    }
     else if (choice == 4) {
-    int q;
-    cout << "Enter time quantum: ";
-    cin >> q;
-    scheduler = new RoundRobin(q);
+        int q;
+        cout << "Enter time quantum: ";
+        cin >> q;
+        scheduler = new RoundRobin(q);
     }
     else if (choice == 5) {
-    auto policy = PolicyEngine::choosePolicy(allTasks);
-    scheduler = (policy == PolicyType::SJF) ? (Scheduler*)new SJF() : (Scheduler*)new FCFS();
+        scheduler = new SRTF();
     }
-    else if (choice == 6) scheduler = new SRTF();
+    else if (choice == 6) {
+
+        PolicyType policy = PolicyEngine::choosePolicy(allTasks);
+
+        cout << "\n[AUTO MODE]\n";
+
+        switch (policy) {
+
+            case PolicyType::SJF:
+                cout << "Selected: SJF (short batch workload)\n";
+                scheduler = new SJF();
+                break;
+
+            case PolicyType::SRTF:
+                cout << "Selected: SRTF (preemptive short jobs)\n";
+                scheduler = new SRTF();
+                break;
+
+            case PolicyType::PRIORITY:
+                cout << "Selected: Priority Scheduling\n";
+                scheduler = new PriorityScheduler();
+                break;
+
+            case PolicyType::ROUND_ROBIN:
+                cout << "Selected: Round Robin (interactive workload)\n";
+                scheduler = new RoundRobin(4);
+                break;
+
+            default:
+                cout << "Selected: FCFS (batch workload)\n";
+                scheduler = new FCFS();
+        }
+    }
     else {
         cout << "Invalid choice\n";
         return 0;
