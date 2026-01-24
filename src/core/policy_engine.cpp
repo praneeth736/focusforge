@@ -1,54 +1,35 @@
 #include "policy_engine.h"
-#include <cmath>
 
 PolicyType PolicyEngine::choosePolicy(const std::vector<Task>& tasks) {
 
-    int n = tasks.size();
+    int interactiveJobs = 0;
+    int cpuJobs = 0;
 
-    double totalBurst = 0;
-    double maxBurst = 0;
-    double minBurst = 1e9;
-
-    int earliestArrival = 1e9;
-    int latestArrival = 0;
-
-    int minPriority = 1e9;
-    int maxPriority = 0;
+    double avgBurst = 0;
 
     for (auto& t : tasks) {
-        totalBurst += t.burst;
-        maxBurst = std::max(maxBurst, (double)t.burst);
-        minBurst = std::min(minBurst, (double)t.burst);
+        avgBurst += t.burst;
 
-        earliestArrival = std::min(earliestArrival, t.arrival);
-        latestArrival = std::max(latestArrival, t.arrival);
-
-        minPriority = std::min(minPriority, t.priority);
-        maxPriority = std::max(maxPriority, t.priority);
+        if (t.burst <= 20)
+            interactiveJobs++;
+        else
+            cpuJobs++;
     }
 
-    double avgBurst = totalBurst / n;
-    double arrivalSpread = latestArrival - earliestArrival;
-    double prioritySpread = maxPriority - minPriority;
+    avgBurst /= tasks.size();
 
-    // 🔥 Decision logic
+    // Interactive workload → MLFQ
+    if (interactiveJobs >= cpuJobs)
+        return PolicyType::MLFQ;
 
-    // Many short jobs
-    if (avgBurst <= 20 && arrivalSpread == 0)
-        return PolicyType::SJF;
-
-    // Streaming arrivals with short jobs
-    if (avgBurst <= 25 && arrivalSpread > 0)
+    // Short jobs but arrival-based
+    if (avgBurst <= 30)
         return PolicyType::SRTF;
 
-    // Priority-sensitive workload
-    if (prioritySpread >= 3)
-        return PolicyType::PRIORITY;
+    // Medium batch
+    if (avgBurst <= 60)
+        return PolicyType::SJF;
 
-    // Many processes → time-sharing
-    if (n >= 6)
-        return PolicyType::ROUND_ROBIN;
-
-    // Default safe batch scheduler
+    // Long batch jobs
     return PolicyType::FCFS;
 }

@@ -3,7 +3,7 @@
 
 #include "src/core/task.h"
 #include "src/core/policy_engine.h"
-
+#include "src/algorithms/mlfq.h"
 #include "src/algorithms/fcfs.h"
 #include "src/algorithms/sjf.h"
 #include "src/algorithms/priority.h"
@@ -75,37 +75,31 @@ int main() {
     }
     else if (choice == 6) {
 
-        PolicyType policy = PolicyEngine::choosePolicy(allTasks);
+    PolicyType policy = PolicyEngine::choosePolicy(allTasks);
 
-        cout << "\n[AUTO MODE]\n";
+    cout << "\n[AUTO MODE]\n";
 
-        switch (policy) {
-
-            case PolicyType::SJF:
-                cout << "Selected: SJF (short batch workload)\n";
-                scheduler = new SJF();
-                break;
-
-            case PolicyType::SRTF:
-                cout << "Selected: SRTF (preemptive short jobs)\n";
-                scheduler = new SRTF();
-                break;
-
-            case PolicyType::PRIORITY:
-                cout << "Selected: Priority Scheduling\n";
-                scheduler = new PriorityScheduler();
-                break;
-
-            case PolicyType::ROUND_ROBIN:
-                cout << "Selected: Round Robin (interactive workload)\n";
-                scheduler = new RoundRobin(4);
-                break;
-
-            default:
-                cout << "Selected: FCFS (batch workload)\n";
-                scheduler = new FCFS();
-        }
+    if (policy == PolicyType::MLFQ) {
+        cout << "Selected: MLFQ (Linux-style adaptive scheduler)\n";
+        scheduler = new MLFQ();
     }
+    else if (policy == PolicyType::SRTF) {
+        cout << "Selected: SRTF (preemptive short jobs)\n";
+        scheduler = new SRTF();
+    }
+    else if (policy == PolicyType::ROUND_ROBIN) {
+        cout << "Selected: Round Robin (interactive workload)\n";
+        scheduler = new RoundRobin(4);
+    }
+    else if (policy == PolicyType::SJF) {
+        cout << "Selected: SJF (batch workload)\n";
+        scheduler = new SJF();
+    }
+    else {
+        cout << "Selected: FCFS (long CPU-bound workload)\n";
+        scheduler = new FCFS();
+    }
+}
     else {
         cout << "Invalid choice\n";
         return 0;

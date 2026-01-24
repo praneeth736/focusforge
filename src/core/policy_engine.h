@@ -9,7 +9,8 @@ enum class PolicyType {
     SJF,
     SRTF,
     PRIORITY,
-    ROUND_ROBIN
+    ROUND_ROBIN,
+    MLFQ
 };
 
 class PolicyEngine {
