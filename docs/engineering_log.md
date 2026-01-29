@@ -208,3 +208,149 @@ VERY VERY IMPORTANTTTTTTTTTTTTTTTTT
 Replaced algorithm-level printing with kernel-level execution tracing
 
 Unified statistics computation across all scheduling policies
+
+
+Day 5 – Linux-Style MLFQ & Interactive Kernel Loop
+
+Today FocusForge reached full operating-system scheduler maturity.
+
+The project transitioned from a one-time simulation program into a persistent kernel-driven scheduling system capable of handling continuous workloads — similar to how a real OS runs indefinitely.
+
+✅ What was implemented
+1️⃣ Multi-Level Feedback Queue (MLFQ)
+
+Implemented MLFQ (Multi-Level Feedback Queue) scheduling
+
+Introduced multiple priority queues with different time quanta
+
+Tasks dynamically move between queues based on CPU usage
+
+CPU-bound tasks are demoted
+
+Interactive tasks remain in higher queues
+
+This mirrors how:
+
+Linux CFS
+
+Windows Scheduler
+
+BSD schedulers
+
+balance fairness + responsiveness.
+
+2️⃣ MLFQ integrated into AUTO mode
+
+AUTO mode now supports:
+
+FCFS
+
+SJF
+
+SRTF
+
+Priority Scheduling
+
+Round Robin
+
+MLFQ (Linux-style adaptive scheduler)
+
+The kernel dynamically decides when MLFQ is required instead of forcing a fixed algorithm.
+
+3️⃣ Dynamic workload analysis (no hardcoding)
+
+AUTO mode no longer depends on fixed constants.
+
+Instead, it analyzes:
+
+ratio of short jobs vs long jobs
+
+average CPU burst
+
+arrival pattern
+
+task distribution
+
+Example logic:
+
+More interactive jobs → MLFQ
+
+Continuous short arrivals → SRTF
+
+Large runnable set → Round Robin
+
+Similar-sized batch jobs → SJF
+
+Long CPU-heavy batch → FCFS
+
+This mimics real OS heuristic-based schedulers.
+
+4️⃣ Kernel-level execution tracing
+
+Execution tracking was fully centralized inside the kernel:
+
+Execution timeline
+
+Context switch detection
+
+CPU idle time tracking
+
+Completion timestamps
+
+Algorithms no longer print anything themselves.
+
+The kernel now owns:
+
+telemetry
+
+statistics
+
+reporting
+
+This enforces strict:
+
+policy vs mechanism separation
+
+5️⃣ Interactive kernel execution loop
+
+FocusForge is no longer a “run once and exit” program.
+
+The kernel now supports:
+
+adding tasks
+
+running scheduler
+
+selecting algorithm manually
+
+running AUTO mode
+
+removing individual tasks
+
+clearing all tasks
+
+continuing execution until exit
+
+This mirrors real OS behavior:
+
+the kernel never stops — only workloads change.
+
+6️⃣ User workflow redesign
+
+Final backend flow:
+
+Add tasks
+
+Run scheduler directly (AUTO)
+
+Or manually select algorithm
+
+Observe execution timeline and statistics
+
+Add or remove tasks again
+
+Re-run scheduler
+
+Continue until exit
+
+This prepares the backend for frontend-driven interaction.
