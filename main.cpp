@@ -4,12 +4,7 @@
 
 #include "src/core/task.h"
 #include "src/core/policy_engine.h"
-#include "src/algorithms/mlfq.h"
-#include "src/algorithms/fcfs.h"
-#include "src/algorithms/sjf.h"
-#include "src/algorithms/priority.h"
-#include "src/algorithms/round_robin.h"
-#include "src/algorithms/srtf.h"
+#include "src/engine/scheduler_runner.h"
 
 using namespace std;
 
@@ -73,40 +68,14 @@ int main() {
             int mode;
             cin >> mode;
 
-            Scheduler* scheduler = nullptr;
+            PolicyType policy;
 
             // ================= AUTO MODE =================
             if (mode == 1) {
-
-                PolicyType policy = PolicyEngine::choosePolicy(allTasks);
-
-                cout << "\n[AUTO MODE]\n";
-
-                if (policy == PolicyType::MLFQ) {
-                    cout << "Selected: MLFQ (Linux-style adaptive scheduler)\n";
-                    scheduler = new MLFQ();
-                }
-                else if (policy == PolicyType::SRTF) {
-                    cout << "Selected: SRTF (preemptive short jobs)\n";
-                    scheduler = new SRTF();
-                }
-                else if (policy == PolicyType::ROUND_ROBIN) {
-                    cout << "Selected: Round Robin (interactive workload)\n";
-                    scheduler = new RoundRobin(4);
-                }
-                else if (policy == PolicyType::SJF) {
-                    cout << "Selected: SJF (batch workload)\n";
-                    scheduler = new SJF();
-                }
-                else {
-                    cout << "Selected: FCFS (long CPU-bound workload)\n";
-                    scheduler = new FCFS();
-                }
+                policy = PolicyEngine::choosePolicy(allTasks);
             }
-
             // ================= MANUAL MODE =================
             else {
-
                 cout << "\nChoose Algorithm:\n";
                 cout << "1. FCFS\n";
                 cout << "2. SJF\n";
@@ -119,25 +88,20 @@ int main() {
                 int c;
                 cin >> c;
 
-                if (c == 1) scheduler = new FCFS();
-                else if (c == 2) scheduler = new SJF();
-                else if (c == 3) scheduler = new PriorityScheduler();
-                else if (c == 4) scheduler = new RoundRobin(4);
-                else if (c == 5) scheduler = new SRTF();
-                else if (c == 6) scheduler = new MLFQ();
+                if (c == 1) policy = PolicyType::FCFS;
+                else if (c == 2) policy = PolicyType::SJF;
+                else if (c == 3) policy = PolicyType::PRIORITY;
+                else if (c == 4) policy = PolicyType::ROUND_ROBIN;
+                else if (c == 5) policy = PolicyType::SRTF;
+                else if (c == 6) policy = PolicyType::MLFQ;
                 else {
                     cout << "Invalid choice.\n";
                     continue;
                 }
             }
 
-            for (auto& t : allTasks)
-                scheduler->addTask(t);
-
-            scheduler->run();
-            scheduler->printStats();
-
-            delete scheduler;
+            // 🔥 Single execution point
+            SchedulerRunner::run(allTasks, policy);
         }
 
         // =====================================================
