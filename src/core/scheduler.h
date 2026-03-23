@@ -2,13 +2,15 @@
 #define SCHEDULER_H
 
 #include "task.h"
+#include "scheduler_result.h"
 #include <vector>
 #include <map>
 #include <iostream>
 
 class Scheduler {
 protected:
-    std::vector<Task> tasks;
+    std::vector<Task> tasks;    
+    SchedulerResult result;
 
     // common stats storage
     std::vector<std::pair<int, std::string>> executionOrder;
@@ -44,21 +46,11 @@ protected:
         totalTurnaround += turnaround;
     }
 
-    std::cout << "\nExecution Timeline:\n";
-    for (auto& e : executionOrder) {
-        std::cout << "Time " << e.first << " -> " << e.second << "\n";
-    }
-
-    std::cout << "\nContext Switches: " << contextSwitches - 1 << "\n";
-    std::cout << "CPU Idle Time: " << idleTime << "\n";
-
-    std::cout << "\nAverage Waiting Time: "
-              << totalWaiting / tasks.size() << "\n";
-
-    std::cout << "Average Turnaround Time: "
-              << totalTurnaround / tasks.size() << "\n";
+    result.avgWaitingTime = totalWaiting / tasks.size();
+    result.avgTurnaroundTime = totalTurnaround / tasks.size();
+    result.contextSwitches = contextSwitches - 1;
+    result.cpuIdleTime = idleTime;
 }
-
 
 public:
     virtual ~Scheduler() {}
@@ -72,6 +64,10 @@ public:
     virtual void printStats() {
         computeStats();
     }
+    SchedulerResult getResult() {
+    return result;
+    }
+
 };
 
 #endif
