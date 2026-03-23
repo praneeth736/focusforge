@@ -1,5 +1,4 @@
 #include "scheduler_runner.h"
-
 #include "../algorithms/fcfs.h"
 #include "../algorithms/sjf.h"
 #include "../algorithms/srtf.h"
@@ -8,7 +7,7 @@
 #include "../algorithms/mlfq.h"
 
 #include <iostream>
-
+#include<fstream>
 using namespace std;
 
 void SchedulerRunner::run(
@@ -58,7 +57,18 @@ void SchedulerRunner::run(
     }
 
     scheduler->run();
+
+    std::ofstream out("output.txt", std::ios::trunc);
+    out.close();
+    out << "\n=== Execution Timeline ===\n";
+    for (auto& entry : scheduler->getExecutionOrder()) {
+        out << "[t=" << entry.first << "] " << entry.second << " -> ";
+    }
+    out << "END\n";
+    out.close();
+    scheduler->printExecution();
     scheduler->printStats();
 
     delete scheduler;
+    cout << "\n=== EXECUTION COMPLETE ===\n";
 }

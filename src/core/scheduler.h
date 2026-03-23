@@ -9,32 +9,33 @@
 
 class Scheduler {
 protected:
-    std::vector<Task> tasks;    
-    SchedulerResult result;
+std::vector<Task> tasks;
+SchedulerResult result;
 
-    // common stats storage
-    std::vector<std::pair<int, std::string>> executionOrder;
-    std::map<std::string, int> finishTime;
+// execution tracking
+std::vector<std::pair<int, std::string>> executionOrder;
+std::map<std::string, int> finishTime;
 
-    int contextSwitches = 0;
-    int idleTime = 0;
-    std::string lastTask = "IDLE";
+int contextSwitches = 0;
+int idleTime = 0;
+std::string lastTask = "IDLE";
 
-    // called by algorithms
-    void recordExecution(int time, const std::string& taskName) {
+// record execution (called by algorithms)
+void recordExecution(int time, const std::string& taskName) {
 
-        if (taskName != lastTask) {
-            contextSwitches++;
-            executionOrder.push_back({time, taskName});
-            lastTask = taskName;
-        }
-
-        if (taskName == "IDLE") {
-            idleTime++;
-        }
+    if (taskName != lastTask) {
+        contextSwitches++;
+        executionOrder.push_back({time, taskName});
+        lastTask = taskName;
     }
 
-   void computeStats() {
+    if (taskName == "IDLE") {
+        idleTime++;
+    }
+}
+
+// compute statistics
+void computeStats() {
     double totalWaiting = 0;
     double totalTurnaround = 0;
 
@@ -53,20 +54,44 @@ protected:
 }
 
 public:
-    virtual ~Scheduler() {}
+virtual ~Scheduler() {}
 
-    virtual void addTask(const Task& t) {
-        tasks.push_back(t);
+virtual void addTask(const Task& t) {
+    tasks.push_back(t);
+}
+
+virtual void run() = 0;
+
+// 🔥 NEW: Print execution timeline
+virtual void printExecution() {
+    std::cout << "\n=== Execution Timeline ===\n";
+
+    for (auto& entry : executionOrder) {
+        std::cout << "[t=" << entry.first << "] " << entry.second << " -> ";
     }
 
-    virtual void run() = 0;
+    std::cout << "END\n";
+}
 
-    virtual void printStats() {
-        computeStats();
-    }
-    SchedulerResult getResult() {
+// 🔥 UPDATED: Print stats properly
+virtual void printStats() {
+    computeStats();
+
+    std::cout << "\n=== STATS ===\n";
+    std::cout << "Avg Waiting Time: " << result.avgWaitingTime << "\n";
+    std::cout << "Avg Turnaround Time: " << result.avgTurnaroundTime << "\n";
+    std::cout << "Context Switches: " << result.contextSwitches << "\n";
+    std::cout << "CPU Idle Time: " << result.cpuIdleTime << "\n";
+}
+
+// 🔥 ADD THIS HERE (IMPORTANT)
+const std::vector<std::pair<int, std::string>>& getExecutionOrder() const {
+    return executionOrder;
+}
+
+SchedulerResult getResult() {
     return result;
-    }
+}
 
 };
 

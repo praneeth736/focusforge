@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-
+#include<fstream>
 #include "src/core/task.h"
 #include "src/core/policy_engine.h"
 #include "src/engine/scheduler_runner.h"
@@ -9,7 +9,8 @@
 using namespace std;
 
 int main() {
-
+    std::ofstream clearFile("frontend/public/output.txt", std::ios::trunc);
+    clearFile.close();
     vector<Task> allTasks;
 
     while (true) {
@@ -136,6 +137,15 @@ int main() {
                 allTasks.erase(it, allTasks.end());
                 cout << "Task removed successfully.\n";
             }
+
+            cout << "\nRemaining tasks:\n";
+            if (allTasks.empty()) {
+        cout << "No tasks left.\n";
+    } else {
+        for (auto& t : allTasks) {
+            cout << " - " << t.name << "\n";
+        }
+    }
         }
 
         // =====================================================

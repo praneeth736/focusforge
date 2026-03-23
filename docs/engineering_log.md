@@ -354,3 +354,127 @@ Re-run scheduler
 Continue until exit
 
 This prepares the backend for frontend-driven interaction.
+
+
+
+## 📅 Engineering Log – FocusForge Completion
+
+### 🔥 Major Progress
+
+* Successfully completed **FocusForge OS Scheduler Project**
+* Implemented and tested multiple scheduling algorithms:
+
+  * FCFS
+  * SJF
+  * SRTF
+  * Priority Scheduling
+  * Round Robin
+  * MLFQ (Multi-Level Feedback Queue)
+
+### 🧠 Core System Improvements
+
+* Built **SchedulerRunner (kernel-style execution controller)**
+* Implemented **AUTO policy selection** using PolicyEngine
+* Designed clear **separation of policy and mechanism**
+* Added **execution tracking system** using time-based logs
+
+### 📊 Output & Visualization
+
+* Implemented **execution timeline tracing**:
+
+  * Format: `[t=0] T1 -> [t=4] T2 -> ...`
+* Added **performance metrics**:
+
+  * Average Waiting Time
+  * Turnaround Time
+  * Context Switches
+  * CPU Idle Time
+* Created **printExecution()** and improved **printStats()**
+
+### 🛠️ Debugging & Fixes
+
+* Fixed missing execution output issue
+* Implemented **executionOrder tracking**
+* Resolved protected access issue using `getExecutionOrder()`
+* Fixed file writing bugs and ensured correct execution flow
+* Solved **stale output issue** by:
+
+  * Clearing output file at program start
+  * Writing to correct frontend path
+
+### 🔗 Frontend Integration
+
+* Simplified React UI for **output visualization only**
+* Connected frontend with backend using `output.txt`
+* Implemented **fetch-based display system**
+* Handled empty state (no execution case)
+
+### 🧩 System Design Decisions
+
+* Used **file-based communication** between backend and frontend
+* Maintained clean separation:
+
+  * Backend → computation
+  * Frontend → visualization
+* Chose simplicity over unnecessary complexity (no API layer)
+
+### 🚀 Final Status
+
+* Backend: ✅ Complete
+* Scheduler Logic: ✅ Complete
+* Output System: ✅ Complete
+* Frontend Visualization: ✅ Complete
+* Project: 🎯 **Interview Ready**
+
+### 💡 Key Learnings
+
+* Importance of **separation of concerns**
+* Real-world debugging (file paths, stale data, execution flow)
+* Designing systems with **clarity over complexity**
+* How OS-level scheduling works internally
+
+---
+
+## 📅 Engineering Log – FocusForge (Today)
+
+### 🔥 Key Work Done
+
+* Fixed missing scheduler output issue (execution was running but not displayed)
+* Implemented **execution timeline printing** using `executionOrder`
+* Added `printExecution()` function to visualize scheduling steps
+
+### 🛠️ Debugging & Fixes
+
+* Resolved compilation errors (missing functions, protected access issues)
+* Added `getExecutionOrder()` to safely access execution data
+* Fixed incorrect file paths causing multiple `output.txt` files
+* Ensured backend writes to **frontend/public/output.txt**
+
+### 📊 Output System Improvements
+
+* Implemented file-based output using `ofstream`
+* Ensured **fresh output** using `std::ios::trunc`
+* Handled stale data issue by clearing file at program start
+
+### 🔗 Frontend Changes
+
+* Simplified frontend to **visualization-only UI**
+* Removed unnecessary task input from frontend
+* Connected frontend to backend using `fetch("/output.txt")`
+* Added handling for empty/no execution state
+
+### 🧠 Key Learnings
+
+* Importance of **correct file paths and working directories**
+* Difference between backend execution and frontend display
+* Handling **stale data and synchronization issues**
+* Real-world debugging of system integration
+
+### 🚀 Status Update
+
+* Backend execution: ✅ Working
+* Output generation: ✅ Fixed
+* Frontend visualization: ✅ Working
+* Project: 🎯 **Completed and ready for demo**
+
+---

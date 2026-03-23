@@ -1,28 +1,36 @@
-import { useState } from 'react';
-import TaskForm from '../components/TaskForm';
-import TaskList from '../components/TaskList';
-import SchedulerControls from '../components/SchedulerControls';
+import { useState } from "react";
 
-const Dashboard = () => {
-  const [tasks, setTasks] = useState([]);
+function Dashboard() {
+  const [output, setOutput] = useState("");
 
-  const addTask = (task) => {
-    setTasks([...tasks, task]);
-  };
+  const runScheduler = async () => {
+  try {
+    const res = await fetch("/output.txt");
+    const text = await res.text();
 
-  const removeTask = (name) => {
-    setTasks(tasks.filter((t) => t.name !== name));
-  };
+    if (!text.trim()) {
+      setOutput("⚠️ No execution yet. Please run the scheduler.");
+    } else {
+      setOutput(text);
+    }
+  } catch (err) {
+    setOutput("Error loading output.txt");
+  }
+};
 
   return (
-    <div>
-      <h2>FocusForge Scheduler</h2>
+    <div style={{ padding: "20px", fontFamily: "Arial" }}>
+      
+      {/* 🔥 TITLE UPDATED */}
+      <h1>🚀 FocusForge</h1>
+      <h3>Intelligent OS Scheduler Visualization</h3>
 
-      <TaskForm addTask={addTask} />
-      <TaskList tasks={tasks} removeTask={removeTask} />
-      <SchedulerControls tasks={tasks} />
+      <button onClick={runScheduler}>Show Output</button>
+
+      <h3>Execution Output</h3>
+      <pre>{output}</pre>
     </div>
   );
-};
+}
 
 export default Dashboard;
